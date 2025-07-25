@@ -7,6 +7,7 @@ export default function Header() {
   const navItems = [
     { path: '/', label: 'Upload' },
     { path: '/processing', label: 'Processing' },
+    { path: '/notion', label: 'Notion Sync' },
   ];
 
   return (

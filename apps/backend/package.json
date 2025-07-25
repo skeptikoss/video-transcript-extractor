@@ -19,6 +19,7 @@
     "db:schema:sync": "ts-node ./node_modules/typeorm/cli.js schema:sync -d src/database/config.ts"
   },
   "dependencies": {
+    "@notionhq/client": "^4.0.1",
     "@types/bull": "^3.15.9",
     "@types/range-parser": "^1.2.7",
     "@types/serve-static": "^1.15.8",
@@ -32,6 +33,7 @@
     "file-type": "^18.7.0",
     "helmet": "^7.1.0",
     "ioredis": "^5.6.1",
+    "limiter": "^3.0.0",
     "multer": "^2.0.0-alpha.7",
     "openai": "^5.10.2",
     "reflect-metadata": "^0.1.13",
