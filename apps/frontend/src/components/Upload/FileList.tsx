@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import UploadProgress from './UploadProgress';
+import TranscriptionStatus from '../Transcription/TranscriptionStatus';
 
 interface FileWithProgress {
   file: File;
@@ -131,7 +132,7 @@ export default function FileList({ files, onStartUpload, onRemoveFile }: FileLis
                 {/* Success Message */}
                 {fileWithProgress.status === 'completed' && fileWithProgress.uploadResponse && (
                   <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-sm text-green-700">
-                    Upload successful! File ID: {fileWithProgress.uploadResponse.data?.id}
+                    Upload successful! Starting transcription...
                   </div>
                 )}
               </div>
@@ -157,6 +158,17 @@ export default function FileList({ files, onStartUpload, onRemoveFile }: FileLis
                 )}
               </div>
             </div>
+            
+            {/* Transcription Status */}
+            {fileWithProgress.status === 'completed' && 
+             fileWithProgress.uploadResponse?.data?.id && (
+              <div className="mt-4">
+                <TranscriptionStatus
+                  videoId={fileWithProgress.uploadResponse.data.id}
+                  jobId={fileWithProgress.uploadResponse.data.jobId}
+                />
+              </div>
+            )}
           </div>
         ))}
       </div>

@@ -8,7 +8,10 @@ import { createLogger } from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
 import healthRoutes from './routes/health';
 import uploadRoutes from './routes/upload';
+import transcriptionRoutes from './routes/transcription';
 import DatabaseService from './database/DatabaseService';
+import { transcriptionWorker } from './workers/TranscriptionWorker';
+import { audioExtractorService } from './services/AudioExtractorService';
 
 // Load environment variables
 dotenv.config();
@@ -41,6 +44,7 @@ app.use((req, _res, next) => {
 // Routes
 app.use('/api/health', healthRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/transcription', transcriptionRoutes);
 
 // 404 handler
 app.use('*', (_req, res) => {
@@ -59,6 +63,18 @@ async function startServer() {
     // Initialize database
     const dbService = DatabaseService.getInstance();
     await dbService.initialize();
+    
+    // Initialize transcription worker
+    transcriptionWorker; // This initializes the singleton
+    
+    // Setup cleanup job for old audio files (run every hour)
+    setInterval(async () => {
+      try {
+        await audioExtractorService.cleanupOldFiles(24 * 60 * 60 * 1000); // 24 hours
+      } catch (error) {
+        logger.error('Failed to cleanup old audio files:', error);
+      }
+    }, 60 * 60 * 1000); // 1 hour
     
     // Start server
     app.listen(PORT, () => {
@@ -79,6 +95,7 @@ startServer();
 process.on('SIGINT', async () => {
   logger.info('Received SIGINT, shutting down gracefully');
   try {
+    await transcriptionWorker.shutdown();
     const dbService = DatabaseService.getInstance();
     await dbService.gracefulShutdown();
   } catch (error) {
@@ -90,6 +107,7 @@ process.on('SIGINT', async () => {
 process.on('SIGTERM', async () => {
   logger.info('Received SIGTERM, shutting down gracefully');
   try {
+    await transcriptionWorker.shutdown();
     const dbService = DatabaseService.getInstance();
     await dbService.gracefulShutdown();
   } catch (error) {

@@ -5,6 +5,8 @@ import { uploadSingle, handleMulterError } from '../middleware/uploadMiddleware'
 import FileStorageService from '../services/FileStorageService';
 import DatabaseService from '../database/DatabaseService';
 import { VideoStatus } from '../database/entities/Video';
+import { queueService } from '../services/QueueService';
+import { Job as JobEntity } from '../database/entities/Job';
 
 const router = Router();
 const logger = createLogger('upload');
@@ -54,17 +56,34 @@ router.post(
         status: VideoStatus.UPLOADED
       });
 
-      logger.info('File uploaded successfully', {
+      // Create job record in database
+      const jobRecord = new JobEntity();
+      jobRecord.videoId = videoRecord.id;
+      jobRecord.type = 'transcription';
+      jobRecord.status = 'pending';
+      jobRecord.priority = 0;
+      jobRecord.progress = 0;
+      await dbService.getJobRepository().save(jobRecord);
+
+      // Add transcription job to queue
+      const queueJob = await queueService.addTranscriptionJob({
+        videoId: videoRecord.id,
+        videoPath: fileMetadata.uploadPath,
+        originalName: fileMetadata.originalName
+      });
+
+      logger.info('File uploaded and queued for transcription', {
         id: videoRecord.id,
         filename: videoRecord.filename,
         originalName: videoRecord.originalName,
-        size: videoRecord.size
+        size: videoRecord.size,
+        jobId: queueJob.id
       });
 
       // Return success response
       res.status(201).json({
         success: true,
-        message: 'File uploaded successfully',
+        message: 'File uploaded successfully and queued for transcription',
         data: {
           id: videoRecord.id,
           filename: videoRecord.filename,
@@ -73,7 +92,8 @@ router.post(
           mimeType: videoRecord.mimeType,
           duration: videoRecord.duration,
           status: videoRecord.status,
-          uploadedAt: videoRecord.createdAt
+          uploadedAt: videoRecord.createdAt,
+          jobId: queueJob.id
         }
       });
 
