@@ -8,19 +8,49 @@ This application processes multiple MP4 video files, extracts high-quality trans
 
 ## 🚀 Features
 
-- **Batch Video Processing**: Upload and process multiple MP4 files simultaneously
+### ✅ Currently Available
+- **Drag & Drop Upload**: Modern file upload interface with progress tracking
 - **AI-Powered Transcription**: Uses OpenAI Whisper for accurate speech-to-text
-- **Notion Integration**: Automatically syncs transcripts to your Notion database
-- **Real-time Progress**: WebSocket-powered progress tracking
-- **Queue Management**: Robust job queue for reliable processing
+- **Real-time Progress**: Live progress tracking with stage indicators
+- **Queue Management**: Robust Bull queue for reliable background processing
 - **Error Recovery**: Automatic retry with exponential backoff
+- **Transcript Management**: Preview, copy, and download transcripts
+- **Professional UI**: Responsive design with real-time status updates
+
+### 🔄 In Development
+- **Notion Integration**: Automatically sync transcripts to your Notion database (Phase 3)
+- **WebSocket Updates**: Enhanced real-time communication (Phase 3)
+- **Advanced Features**: Search, filtering, bulk operations (Phase 4)
+
+## 🚦 Current Status
+
+**Phase 2 Complete**: Core transcription pipeline is fully operational! 🎉
+
+- ✅ **Working**: Upload videos → Automatic transcription → View/download transcripts
+- ✅ **Tested**: End-to-end pipeline with real video files
+- ✅ **Production Ready**: Error handling, progress tracking, resource management
+- 🔄 **Next**: Notion integration (Phase 3)
+
+## 🚀 Quick Start
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Set up environment variables in .env
+OPENAI_API_KEY=your-openai-api-key
+
+# 3. Start the application
+npm run dev
+
+# 4. Open http://localhost:5173 and upload a video!
+```
 
 ## 📋 Prerequisites
 
 - Node.js 20.x LTS
 - FFmpeg installed locally
-- OpenAI API key
-- Notion integration token
+- OpenAI API key (Notion integration coming in Phase 3)
 - 500MB+ free disk space
 
 ## 🛠️ Installation
